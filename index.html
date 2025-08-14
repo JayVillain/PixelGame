@@ -3,15 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>Kisah Cinta di Edinburgh</title>
-
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
     <div id="game-container">
         <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+        <div id="ui-container">
+            <div id="dialogue-box" class="hidden">
+                <div id="character-name"></div>
+                <div id="dialogue-text"></div>
+                <div id="continue-icon">▼</div>
+            </div>
+            <div id="choices-box" class="hidden">
+                </div>
+        </div>
     </div>
 
     <script src="js/script.js"></script>
