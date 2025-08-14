@@ -19,7 +19,7 @@ let currentSceneIndex = 0;
 const assets = {}; // Objek kosong untuk menyimpan semua gambar yang sudah dimuat.
 
 // =================================================================================
-// 3. SCRIPT CERITA (NASKAH GAME) - [UPDATE 2: NASKAH LENGKAP]
+// 3. SCRIPT CERITA (NASKAH GAME)
 // =================================================================================
 // Ini adalah naskah lengkap game Anda.
 const storyScript = [
@@ -271,34 +271,32 @@ const storyScript = [
 function displayScene(index) {
     const scene = storyScript[index];
 
-    // Sembunyikan semua UI dulu untuk memulai dari keadaan bersih
     dialogueBox.classList.add('hidden');
     choicesBox.classList.add('hidden');
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Bersihkan kanvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height); 
 
-    // Gambar latar belakang jika ada di script
     if (scene.background && assets[scene.background]) {
         ctx.drawImage(assets[scene.background], 0, 0, canvas.width, canvas.height);
     } else {
-        // Jika tidak ada background baru, gambar background dari adegan sebelumnya
         const prevSceneWithBg = storyScript.slice(0, index).reverse().find(s => s.background);
         if (prevSceneWithBg && assets[prevSceneWithBg.background]) {
             ctx.drawImage(assets[prevSceneWithBg.background], 0, 0, canvas.width, canvas.height);
         }
     }
 
-    // Tampilkan sprite karakter jika ada di script
     if (scene.sprite && assets[scene.sprite]) {
         const sprite = assets[scene.sprite];
         const scale = 2.5;
         const spriteWidth = sprite.width * scale;
         const spriteHeight = sprite.height * scale;
         const x = (canvas.width - spriteWidth) / 2;
-        const y = canvas.height - spriteHeight - 20; // Posisi di atas dialog box
+        
+        // [PERBAIKAN] BARIS DI BAWAH INI DIUBAH UNTUK MEMPERBAIKI POSISI KARAKTER
+        const y = canvas.height - spriteHeight - 140; // Posisi dinaikkan agar tidak tertutup UI
+        
         ctx.drawImage(sprite, x, y, spriteWidth, spriteHeight);
     }
     
-    // Proses tipe adegan
     if (scene.type === 'dialogue') {
         dialogueBox.classList.remove('hidden');
         characterName.textContent = scene.character;
@@ -306,7 +304,7 @@ function displayScene(index) {
     } 
     else if (scene.type === 'choice') {
         choicesBox.classList.remove('hidden');
-        choicesBox.innerHTML = ''; // Kosongkan pilihan sebelumnya
+        choicesBox.innerHTML = ''; 
 
         scene.choices.forEach(choice => {
             const button = document.createElement('button');
@@ -324,7 +322,6 @@ function displayScene(index) {
             choicesBox.appendChild(button);
         });
     }
-    // [UPDATE 3] MENAMBAHKAN LOGIKA UNTUK TIPE 'JUMP'
     else if (scene.type === 'jump') {
         const targetIndex = storyScript.findIndex(s => s.id === scene.target);
         if (targetIndex !== -1) {
@@ -338,7 +335,6 @@ function displayScene(index) {
         dialogueBox.classList.remove('hidden');
         characterName.textContent = "SYSTEM";
         dialogueText.textContent = "Adegan ini berakhir. Terima kasih sudah bermain!";
-        // Hentikan game agar tidak bisa lanjut lagi
         currentSceneIndex = storyScript.length;
     }
 }
@@ -363,7 +359,6 @@ function nextScene() {
 // 5. PEMUAT ASET & INISIALISASI GAME
 // =================================================================================
 
-// [UPDATE 1] DAFTAR ASET LENGKAP
 const assetPaths = [
     // Backgrounds
     'assets/images/backgrounds/bg_stasiun.png',
@@ -384,7 +379,6 @@ const assetPaths = [
     'assets/images/sprites/azain/malu.png'
 ];
 
-
 /**
  * Memuat semua aset yang ada di `assetPaths` sebelum game dimulai.
  * @param {function} callback - Fungsi yang akan dijalankan setelah semua aset dimuat.
@@ -393,7 +387,6 @@ function startAssetLoader(callback) {
     console.log("Memulai pemuatan aset...");
     let loadedCount = 0;
     
-    // Tampilkan layar loading awal
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = '#FFF';
@@ -411,7 +404,6 @@ function startAssetLoader(callback) {
         img.src = path;
         img.onload = () => {
             loadedCount++;
-            // Menyimpan gambar yang sudah dimuat ke dalam objek assets dengan path lengkap sebagai key
             assets[path] = img;
             console.log(`Berhasil memuat: ${path}`);
             if (loadedCount === assetPaths.length) {
@@ -433,14 +425,12 @@ function startGame() {
     currentSceneIndex = 0;
     displayScene(currentSceneIndex);
     
-    // Menambahkan event listener untuk klik mouse
     document.getElementById('game-container').addEventListener('click', (event) => {
         if (!event.target.classList.contains('choice-button')) {
             nextScene();
         }
     });
 
-    // Menambahkan event listener untuk keyboard (Spasi atau Enter)
     window.addEventListener('keydown', (event) => {
         if(event.key === ' ' || event.key === 'Enter') {
             event.preventDefault();
@@ -450,5 +440,4 @@ function startGame() {
 }
 
 // --- Mulai prosesnya! ---
-// Panggil pemuat aset, dan setelah selesai, ia akan memanggil startGame.
 startAssetLoader(startGame);
