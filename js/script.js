@@ -1,9 +1,10 @@
 // =================================================================================
 // KISAH CINTA DI EDINBURGH - A SIMPLE VISUAL NOVEL ENGINE
+// Dibuat dengan Clean Code dan komentar untuk kemudahan belajar.
 // =================================================================================
 
-// --- SETUP ELEMENT HTML ---
-// Mengambil semua elemen yang kita butuhkan dari index.html
+// --- 1. SETUP ELEMENT HTML ---
+// Mengambil semua elemen interaktif dari file HTML agar bisa kita manipulasi.
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const dialogueBox = document.getElementById('dialogue-box');
@@ -11,26 +12,27 @@ const characterName = document.getElementById('character-name');
 const dialogueText = document.getElementById('dialogue-text');
 const choicesBox = document.getElementById('choices-box');
 
-// --- STATE GAME ---
-// Variabel untuk menyimpan kondisi game saat ini
+// --- 2. GAME STATE ---
+// Variabel untuk menyimpan kondisi atau status game saat ini.
 let currentSceneIndex = 0;
-let assets = {}; // Objek untuk menyimpan semua gambar yang sudah dimuat
+const assets = {}; // Objek kosong untuk menyimpan semua gambar yang sudah dimuat.
 
 // =================================================================================
-// SCRIPT CERITA
+// 3. SCRIPT CERITA (NASKAH GAME)
 // =================================================================================
 // Ini adalah "naskah" game Anda. Setiap objek adalah satu baris dialog atau event.
-// Anda bisa menambahkan cerita Anda di sini.
+// Anda bisa dengan mudah menambah atau mengubah cerita hanya dengan mengedit bagian ini.
 const storyScript = [
     {
         type: 'dialogue',
         character: 'Narator',
+        background: 'bg_stasiun.png',
         text: 'Ramalia baru saja tiba di Edinburgh. Udara dingin langsung menyambutnya begitu ia turun dari kereta.'
     },
     {
         type: 'dialogue',
         character: 'Ramalia',
-        sprite: 'ramalia/normal.png', // Path ke sprite Ramalia
+        sprite: 'ramalia/normal.png',
         text: '(Hahh... akhirnya sampai juga. Kota ini... indah.)'
     },
     {
@@ -41,7 +43,7 @@ const storyScript = [
     {
         type: 'dialogue',
         character: '???',
-        sprite: 'azain/kaget_khawatir.png', // Path ke sprite Azain
+        sprite: 'azain/kaget_khawatir.png',
         text: 'Oh, maaf sekali! Anda tidak apa-apa? Saya benar-benar tidak sengaja.'
     },
     {
@@ -57,15 +59,15 @@ const storyScript = [
         text: 'Syukurlah. Saya Azain. Sekali lagi maaf, ya.'
     },
     {
-        type: 'choice',
+        type: 'choice', // Tipe adegan ini adalah pilihan
         choices: [
             { text: 'Perkenalkan diri dengan ramah.', target: 'perkenalan_ramah' },
             { text: 'Jawab dengan sedikit jutek.', target: 'perkenalan_jutek' }
         ]
     },
-    // --- CABANG CERITA: RAMAH ---
+    // --- CABANG CERITA ---
     {
-        id: 'perkenalan_ramah',
+        id: 'perkenalan_ramah', // ID ini harus cocok dengan 'target' dari pilihan
         type: 'dialogue',
         character: 'Ramalia',
         sprite: 'ramalia/senyum.png',
@@ -77,8 +79,8 @@ const storyScript = [
         sprite: 'azain/senyum.png',
         text: '(Dia tersenyum. Manis sekali.)'
     },
-    { type: 'end' }, // Akhir dari cabang ini
-    // --- CABANG CERITA: JUTEK ---
+    { type: 'end' },
+
     {
         id: 'perkenalan_jutek',
         type: 'dialogue',
@@ -92,43 +94,51 @@ const storyScript = [
         sprite: 'azain/kaget_khawatir.png',
         text: 'Ah... iya, tentu. Maaf.'
     },
-    { type: 'end' } // Akhir dari cabang ini
+    { type: 'end' }
 ];
 
-
 // =================================================================================
-// FUNGSI INTI GAME
+// 4. FUNGSI INTI GAME
 // =================================================================================
 
-// Fungsi untuk menampilkan adegan berdasarkan index dari storyScript
+/**
+ * Fungsi utama untuk menampilkan adegan ke layar berdasarkan index dari storyScript.
+ * @param {number} index - Posisi adegan dalam array storyScript.
+ */
 function displayScene(index) {
     const scene = storyScript[index];
 
-    // Bersihkan layar dari sprite sebelumnya (jika ada)
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // Selalu gambar background utama
-    if (assets['bg_stasiun.png']) {
-        ctx.drawImage(assets['bg_stasiun.png'], 0, 0, canvas.width, canvas.height);
-    }
-    
-    // Sembunyikan semua UI dulu
+    // Sembunyikan semua UI dulu untuk memulai dari keadaan bersih
     dialogueBox.classList.add('hidden');
     choicesBox.classList.add('hidden');
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Bersihkan kanvas
 
+    // Gambar latar belakang jika ada di script
+    if (scene.background && assets[scene.background]) {
+        ctx.drawImage(assets[scene.background], 0, 0, canvas.width, canvas.height);
+    } else {
+        // Jika tidak ada background baru, gambar background sebelumnya
+        const prevSceneWithBg = storyScript.slice(0, index).reverse().find(s => s.background);
+        if (prevSceneWithBg && assets[prevSceneWithBg.background]) {
+            ctx.drawImage(assets[prevSceneWithBg.background], 0, 0, canvas.width, canvas.height);
+        }
+    }
+
+    // Tampilkan sprite karakter jika ada di script
+    if (scene.sprite && assets[scene.sprite]) {
+        const sprite = assets[scene.sprite];
+        // Atur ukuran dan posisi sprite agar proporsional dan di tengah
+        const scale = 2.5;
+        const spriteWidth = sprite.width * scale;
+        const spriteHeight = sprite.height * scale;
+        const x = (canvas.width - spriteWidth) / 2;
+        const y = canvas.height - spriteHeight - 20; // Posisi di atas dialog box
+        ctx.drawImage(sprite, x, y, spriteWidth, spriteHeight);
+    }
+    
+    // Proses tipe adegan
     if (scene.type === 'dialogue') {
         dialogueBox.classList.remove('hidden');
-
-        // Tampilkan sprite karakter
-        if (scene.sprite && assets[scene.sprite]) {
-             // Menggambar sprite di tengah
-             const sprite = assets[scene.sprite];
-             const spriteWidth = sprite.width * 2.5; // Perbesar ukuran sprite
-             const spriteHeight = sprite.height * 2.5;
-             const x = (canvas.width - spriteWidth) / 2;
-             const y = (canvas.height - spriteHeight) / 2 - 50; // Sedikit ke atas
-             ctx.drawImage(sprite, x, y, spriteWidth, spriteHeight);
-        }
-       
         characterName.textContent = scene.character;
         dialogueText.textContent = scene.text;
     } 
@@ -141,13 +151,10 @@ function displayScene(index) {
             button.className = 'choice-button';
             button.textContent = choice.text;
             button.onclick = () => {
-                // Cari scene dengan ID yang sesuai dengan target pilihan
                 const targetIndex = storyScript.findIndex(s => s.id === choice.target);
-                if(targetIndex !== -1) {
+                if (targetIndex !== -1) {
                     currentSceneIndex = targetIndex;
                     displayScene(currentSceneIndex);
-                } else {
-                    console.error('Target scene not found:', choice.target);
                 }
             };
             choicesBox.appendChild(button);
@@ -156,91 +163,102 @@ function displayScene(index) {
     else if (scene.type === 'end') {
         dialogueBox.classList.remove('hidden');
         characterName.textContent = "SYSTEM";
-        dialogueText.textContent = "Adegan ini berakhir. (Lanjutan belum dibuat)";
+        dialogueText.textContent = "Adegan ini berakhir. Terima kasih sudah bermain!";
     }
 }
 
-// Fungsi untuk maju ke adegan selanjutnya
+/**
+ * Fungsi untuk maju ke adegan selanjutnya, dipicu oleh klik atau keyboard.
+ */
 function nextScene() {
-    // Hanya lanjut jika tidak sedang dalam mode memilih
-    if (choicesBox.classList.contains('hidden')) {
-        currentSceneIndex++;
-        if (currentSceneIndex < storyScript.length) {
-            displayScene(currentSceneIndex);
-        }
+    // Fungsi ini hanya boleh berjalan jika tidak ada pilihan yang sedang ditampilkan
+    if (!choicesBox.classList.contains('hidden')) {
+        return; 
+    }
+    currentSceneIndex++;
+    if (currentSceneIndex < storyScript.length) {
+        displayScene(currentSceneIndex);
     }
 }
 
 // =================================================================================
-// PEMUAT ASET & INISIALISASI
+// 5. PEMUAT ASET & INISIALISASI GAME
 // =================================================================================
 
-// Daftar semua aset gambar yang perlu dimuat
+// Daftar semua path aset gambar yang perlu dimuat.
 const assetPaths = [
     'assets/images/backgrounds/bg_stasiun.png',
     'assets/images/sprites/ramalia/normal.png',
     'assets/images/sprites/ramalia/senyum.png',
     'assets/images/sprites/ramalia/kaget.png',
+    'assets/images/sprites/ramalia/malu.png',
     'assets/images/sprites/azain/senyum.png',
-    'assets/images/sprites/azain/kaget_khawatir.png'
+    'assets/images/sprites/azain/kaget_khawatir.png',
+    'assets/images/sprites/azain/malu.png'
 ];
 
+/**
+ * Memuat semua aset yang ada di `assetPaths` sebelum game dimulai.
+ * @param {function} callback - Fungsi yang akan dijalankan setelah semua aset dimuat.
+ */
 function startAssetLoader(callback) {
     console.log("Memulai pemuatan aset...");
     let loadedCount = 0;
     
-    if (assetPaths.length === 0) {
-        callback();
-        return;
-    }
+    // Tampilkan layar loading awal
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#FFF';
+    ctx.textAlign = 'center';
+    ctx.font = '20px Verdana';
+    ctx.fillText('Loading...', canvas.width / 2, canvas.height / 2);
 
     assetPaths.forEach(path => {
         const img = new Image();
         img.src = path;
         img.onload = () => {
             loadedCount++;
-            // Menyimpan gambar yang sudah dimuat ke dalam objek assets
+            // Menyimpan gambar yang sudah dimuat ke dalam objek assets dengan nama file sebagai key
             const key = path.substring(path.lastIndexOf('/') + 1);
-            const subfolder = path.substring(path.indexOf('/') + 1, path.lastIndexOf('/'));
-            const finalKey = subfolder.replace('assets/images/','') + '/' + key;
-
-            assets[finalKey] = img;
+            assets[key] = img;
             console.log(`Berhasil memuat: ${path}`);
             if (loadedCount === assetPaths.length) {
                 console.log("Semua aset berhasil dimuat!");
-                callback();
+                callback(); // Panggil fungsi startGame jika semua sudah selesai
             }
         };
         img.onerror = () => {
-            console.error(`Gagal memuat aset: ${path}`);
+            console.error(`Gagal memuat aset: ${path}. Pastikan path dan nama file benar!`);
         };
     });
 }
 
-// --- MULAI GAME ---
-// Fungsi utama untuk memulai game setelah semua siap
+/**
+ * Fungsi utama untuk memulai game. Mengatur scene awal dan event listener.
+ */
 function startGame() {
     console.log("Game Dimulai!");
     currentSceneIndex = 0;
     displayScene(currentSceneIndex);
     
-    // Tambahkan event listener untuk klik
-    window.addEventListener('click', (event) => {
-        // Cek apakah klik terjadi di dalam tombol pilihan
-        if (event.target.classList.contains('choice-button')) {
-            return; // Jangan lakukan apa-apa, biarkan onclick tombol yang bekerja
+    // Menambahkan event listener untuk klik mouse
+    // Ini cara yang lebih baik untuk menghindari konflik dengan tombol
+    document.getElementById('game-container').addEventListener('click', (event) => {
+        // Cek jika yang diklik BUKAN tombol pilihan
+        if (!event.target.classList.contains('choice-button')) {
+            nextScene();
         }
-        // Jika tidak, lanjutkan dialog
-        nextScene();
     });
 
-    // Tambahkan event listener untuk keyboard
+    // Menambahkan event listener untuk keyboard (Spasi atau Enter)
     window.addEventListener('keydown', (event) => {
         if(event.key === ' ' || event.key === 'Enter') {
+            event.preventDefault(); // Mencegah spasi melakukan scroll halaman
             nextScene();
         }
     });
 }
 
-// Panggil pemuat aset, dan setelah selesai, panggil startGame
+// --- Mulai prosesnya! ---
+// Panggil pemuat aset, dan setelah selesai, ia akan memanggil `startGame`.
 startAssetLoader(startGame);
