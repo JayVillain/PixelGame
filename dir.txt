@@ -4,36 +4,26 @@ game-romansa-lia/
 │
 ├── 📁 assets/
 │   │
-│   ├── 📁 images/
-│   │   │
-│   │   ├── 📁 backgrounds/
-│   │   │   ├── 🖼️ bg_stasiun.png
-│   │   │   ├── 🖼️ bg_kafe.png
-│   │   │   ├── 🖼️ bg_pantai_senja.png
-│   │   │   └── 🖼️ bg_puncak_bukit.png
-│   │   │
-│   │   └── 📁 sprites/
-│   │       ├── 📁 ramalia/
-│   │       │   ├── 🖼️ normal.png
-│   │       │   ├── 🖼️ senyum.png
-│   │       │   ├── 🖼️ kaget.png
-│   │       │   └── 🖼️ malu.png
-│   │       │
-│   │       └── 📁 azain/
-│   │           ├── 🖼️ normal.png
-│   │           ├── 🖼️ senyum.png
-│   │           ├── 🖼️ kaget_khawatir.png
-│   │           └── 🖼️ malu.png
-│   │
-│   └── 📁 audio/
+│   └── 📁 images/
 │       │
-│       ├── 📁 bgm/ (Background Music)
-│       │   ├── 🎵 tema_utama.mp3
-│       │   └── 🎵 suasana_tenang.mp3
+│       ├── 📁 backgrounds/
+│       │   ├── 🖼️ bg_stasiun.png
+│       │   ├── 🖼️ bg_kafe.png
+│       │   ├── 🖼️ bg_pantai_senja.png
+│       │   └── 🖼️ bg_puncak_bukit.png
 │       │
-│       └── 📁 sfx/ (Sound Effects)
-│           ├── 🔊 klik_tombol.wav
-│           └── 🔊 tabrakan_ringan.wav
+│       └── 📁 sprites/
+│           ├── 📁 ramalia/
+│           │   ├── 🖼️ normal.png
+│           │   ├── 🖼️ senyum.png
+│           │   ├── 🖼️ kaget.png
+│           │   └── 🖼️ malu.png
+│           │
+│           └── 📁 azain/
+│               ├── 🖼️ normal.png
+│               ├── 🖼️ senyum.png
+│               ├── 🖼️ kaget_khawatir.png
+│               └── 🖼️ malu.png
 │
 ├── 📁 css/
 │   └── 🎨 style.css
