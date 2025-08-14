@@ -13,7 +13,7 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    overflow: hidden;
+    overflow: hidden; /* Mencegah scroll bar yang tidak perlu */
 }
 
 /* --- Container Game --- */
@@ -23,6 +23,7 @@ body {
     height: 600px;
     border: 3px solid #444;
     background-color: #000;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5); /* Efek bayangan agar lebih menonjol */
 }
 
 canvas#gameCanvas {
@@ -30,6 +31,8 @@ canvas#gameCanvas {
     top: 0;
     left: 0;
     image-rendering: pixelated; /* Menjaga pixel art tetap tajam */
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-crisp-edges;
 }
 
 /* --- Container UI --- */
@@ -43,7 +46,7 @@ canvas#gameCanvas {
     flex-direction: column;
     justify-content: flex-end; /* Mendorong dialog box ke bawah */
     padding: 20px;
-    pointer-events: none; /* Awalnya tidak bisa diklik */
+    pointer-events: none; /* Awalnya tidak bisa diklik, agar klik bisa "menembus" ke canvas */
 }
 
 /* --- Kotak Dialog --- */
@@ -52,10 +55,11 @@ canvas#gameCanvas {
     background-color: rgba(0, 0, 30, 0.85);
     border: 3px solid #6a8dff;
     border-radius: 5px;
-    padding: 15px;
+    padding: 20px;
     color: #FFFFFF;
     pointer-events: auto; /* Kotak dialog bisa diklik */
     position: relative;
+    box-shadow: 0 0 15px rgba(106, 141, 255, 0.3);
 }
 
 #character-name {
@@ -65,13 +69,13 @@ canvas#gameCanvas {
     font-weight: bold;
     font-size: 20px;
     position: absolute;
-    top: -35px; /* Posisi di atas kotak dialog */
-    left: 20px;
+    top: -38px; /* Posisi di atas kotak dialog */
+    left: 25px;
     border-radius: 3px;
 }
 
 #dialogue-text {
-    font-size: 18px;
+    font-size: 20px;
     line-height: 1.5;
 }
 
@@ -99,8 +103,8 @@ canvas#gameCanvas {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    pointer-events: auto;
+    background-color: rgba(0, 0, 0, 0.7); /* Latar lebih gelap saat ada pilihan */
+    pointer-events: auto; /* Box ini bisa diklik */
 }
 
 .choice-button {
@@ -112,13 +116,15 @@ canvas#gameCanvas {
     font-size: 18px;
     font-weight: bold;
     cursor: pointer;
-    min-width: 300px;
+    min-width: 400px;
     text-align: center;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, transform 0.2s;
+    border-radius: 5px;
 }
 
 .choice-button:hover {
     background-color: #a7bfff;
+    transform: scale(1.05);
 }
 
 
